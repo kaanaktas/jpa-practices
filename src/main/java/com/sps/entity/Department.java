@@ -17,7 +17,7 @@ public class Department {
 
     @OneToMany(mappedBy = "department",
             cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             orphanRemoval = true)
     private List<Employee> employees;
 

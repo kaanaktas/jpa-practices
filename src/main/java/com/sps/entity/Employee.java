@@ -28,7 +28,7 @@ public class Employee {
     )
     private Map<String, Address> address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
 
