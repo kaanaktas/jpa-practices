@@ -1,0 +1,12 @@
+language: java
+sudo: false
+jdk: oraclejdk8
+cache:
+  directories:
+  - "$HOME/.ivy2/cache"
+  - "$HOME/.m2"
+install:
+- mvn -N io.takari:maven:wrapper
+- ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+notifications:
+  email: false
