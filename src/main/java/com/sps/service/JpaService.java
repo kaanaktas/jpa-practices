@@ -67,15 +67,20 @@ public class JpaService {
 
     private Department checkDepartment(String name) {
         //Typed Query - not in use
-        TypedQuery<Department> query = em.createQuery("SELECT d from Department d WHERE d.name = :name", Department.class)
+        TypedQuery<Department> typedQuery = em.createQuery("SELECT d from Department d WHERE d.name = :name", Department.class)
                 .setParameter("name", name);
+
+        Department typedQueryResult = typedQuery.getResultList().stream().findFirst().orElse(null);
 
         //Named Query
         TypedQuery<Department> namedQuery = em.createNamedQuery("Department.findByName", Department.class)
                 .setParameter("name", name);
 
-        Department result = namedQuery.getResultList().stream().findFirst().orElse(null);
-        return result;
+        Department namedQueryResult = namedQuery.getResultList().stream().findFirst().orElse(null);
+
+        if (typedQueryResult != namedQueryResult)
+            throw new RuntimeException();
+        return namedQueryResult;
     }
 
     public void findAllDepartmentsWithEmployees() {
@@ -137,5 +142,49 @@ public class JpaService {
                 "SELECT e.department.name, AVG(e.salary*1.0) from Employee e GROUP BY e.department.name", Object[].class).getResultList();
         query2.forEach(d ->
                 System.out.println(Arrays.asList(d).toString()));
+
+        List<Object[]> query3 = em.createQuery(
+                "SELECT e.department.name, AVG(e.salary*1.0) from Employee e GROUP BY e.department.name HAVING AVG(e.salary*1.0) > 6000 ", Object[].class).getResultList();
+        query2.forEach(d ->
+                System.out.println(Arrays.asList(d).toString()));
+
+        List<Object[]> query4 = em.createQuery(
+                "SELECT e FROM Employee e order by e.salary DESC", Object[].class).getResultList();
+        query2.forEach(d ->
+                System.out.println(Arrays.asList(d).toString()));
+    }
+//
+//    public void removePublication() {
+//        em.getTransaction().begin();
+//        Employee emp = findEmployeeByCriteriaByName();
+//        Publication pb = em.find(Publication.class, departmentId);
+//
+//    }
+
+    public void triggerRollBack(){
+        try{
+            em.getTransaction().begin();
+            Publication publication = new Publication();
+            publication.setDate("2022");
+            publication.setName("Test Rollback");
+            publication.setPublicationType(PublicationType.PUBLICATION_B);
+            System.out.println("Publication was added successfully!");
+            em.persist(publication);
+
+            Employee employee = new Employee();
+            employee.setName("Test test");
+            employee.setAddress(null);
+            employee.setEmailAddresses(null);
+            employee.setPhoneNumbers(null);
+            employee.setSalary(1L);
+            employee.setPublication(null);
+            em.persist(employee);
+
+            em.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        }
+
     }
 }

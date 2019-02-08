@@ -59,6 +59,13 @@ public class JpaServiceTest {
         JPAUtil.disableHibernateSqlTrace();
     }
 
+    @Test
+    public void TestTestTriggerRollBack(){
+        JPAUtil.enableHibernateSqlTrace();
+        jpaService.triggerRollBack();
+        JPAUtil.disableHibernateSqlTrace();
+    }
+
 
     @AfterClass
     public static void tearDownClass(){
